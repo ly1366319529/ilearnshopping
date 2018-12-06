@@ -1,5 +1,5 @@
 
-#------------git 笔记-----------------
+#  ------------git 笔记-----------------
 
 ##### 1.配置用户名（提交时引用）
    ##### git config --global user.name “你的用户名”
@@ -54,3 +54,11 @@
    #### /TODO  #仅仅忽略项目根目录下的TODO文件，不包括subdir/TODO
    #### /build   # 忽略build/ 目录下的所有文件
    #### doc/*.txt  # 会忽略 doc/notes.txt  但不包括 doc/server/arch.txt
+   
+   
+   
+   #### 解除远程关联远程 git remote remove origin
+   #### 远程关联： git remote add origin 远程地址
+   #### 提交到远程分支： git push -u origin  master
+   #### 拉取远程仓库内容： git pull origin master -f
+   ####  将分支合推送到远程  git push origin head -u 
