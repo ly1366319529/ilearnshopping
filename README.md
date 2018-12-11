@@ -57,12 +57,7 @@
 
 
  #   -------------20181204-------------
-## 远程分支合并 dev分支
-   ###    git checkout dev
-   ###    git pull origin dev
-   ###    git checkout master
-   ###    git merge dev
-   ###    git push origin master
+
    
    
    ## 数据库设计表
@@ -224,13 +219,15 @@ create table neuedu_shipping(
       primary key(`id`)         
     )ENGINE=INNODB AUTO_INCREMENT=32 DEFAULT CHARSET=UTF8;
  ``` 
-
+   #####  添加索引可以提高查询效率：
+   #####     唯一索引
+   ##### 冗余字段
 
 ###项目架构——四层架构
 ```
 视图层   
-控制层 controller  接收视图层传过来的数据 ，同时负责调用service层，将数据返回到控制层
-业务逻辑层   service  调用dao层
-dao层   调用数据库数据
-依赖关系：上层依赖下
+控制层 controller  接收视图层传递的数据 ，同时负责调用（业务逻辑层）service层，将返回的值通过controller层到视图层层
+业务逻辑层   service 负责具体的业务逻辑   调用dao层
+Dao层   调用数据库数据                      
+依赖关系：上层依赖下层
 ``` 

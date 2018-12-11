@@ -62,3 +62,10 @@
    #### 提交到远程分支： git push -u origin  master
    #### 拉取远程仓库内容： git pull origin master -f
    ####  将分支合推送到远程  git push origin head -u 
+   #### 远程分支的合并
+   ## 远程分支合并 dev分支
+  ###    git checkout dev
+  ###    git pull origin dev
+  ###    git checkout master
+###    git merge dev
+ ###    git push origin master
