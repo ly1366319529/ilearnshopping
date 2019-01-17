@@ -101,10 +101,8 @@ public class CategoryServiceImpl implements CategoryService {
     /**
      * 获取当前分类id及递归子节点categoryId
      */
-
     @Override
     public ServerResponse get_deep_category(Integer categoryId){
-
         //1.参数的非空校验
         if (categoryId==null){
             return ServerResponse.createServerResponseByError("类别id不能为空");
@@ -113,27 +111,26 @@ public class CategoryServiceImpl implements CategoryService {
         Set<Category> categorySet=Sets.newHashSet();
         categorySet=findAllchildCategory(categorySet,categoryId);//通过类别id
         Set<Integer> integerSet=Sets.newHashSet();
+        //遍历set集合
         Iterator<Category> categoryIterator=categorySet.iterator();
         while (categoryIterator.hasNext()){
             Category category=categoryIterator.next();
             integerSet.add(category.getId());
         }
+        //返回set集合
         return ServerResponse.createServerResponseBySuccess(integerSet);
     }
-
     private Set<Category> findAllchildCategory(Set<Category> categorySet,Integer categoryId){
        Category category= categoryMapper.selectByPrimaryKey(categoryId);
        if (category!=null){
            categorySet.add(category);
        }
-
        //查找categoryId下的子节点（平级）
         List<Category> categoryList=categoryMapper.findChildCategory(categoryId);
        if (categoryList!=null&&categoryList.size()!=0){
            //遍历集合
            for (Category category1 : categoryList) {
                findAllchildCategory(categorySet, category1.getId());
-
            }
        }
        return categorySet;

@@ -3,20 +3,31 @@ package com.neuedu.service.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import com.neuedu.common.ResponseCodeCategory;
 import com.neuedu.common.ServerResponse;
 import com.neuedu.dao.CategoryMapper;
 import com.neuedu.dao.ProductMapper;
 import com.neuedu.pojo.Category;
 import com.neuedu.pojo.Product;
+import com.neuedu.service.CategoryService;
 import com.neuedu.service.ProductService;
 import com.neuedu.utils.DateUtil;
+import com.neuedu.utils.FTPUtil;
 import com.neuedu.utils.PropertiesUtil;
 import com.neuedu.vo.ProductDetaVo;
 import com.neuedu.vo.ProductListVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -25,6 +36,8 @@ public class ProductServiceImpl implements ProductService {
     ProductMapper productMapper;
     @Autowired
     CategoryMapper categoryMapper;
+    @Autowired
+   CategoryService categoryService;
     @Override
     public ServerResponse saveOrUpdate(Product product) {
 
@@ -208,6 +221,140 @@ public class ProductServiceImpl implements ProductService {
             }
         }
         PageInfo pageInfo=new PageInfo(productListVoList);
+        return ServerResponse.createServerResponseBySuccess(pageInfo);
+    }
+
+    /**
+     * 图片上传
+     * @param file
+     * @param path
+     * @return
+     */
+    @Override
+    public ServerResponse upload(MultipartFile file, String path) {
+        //非空判断
+        if (file==null){
+            return ServerResponse.createServerResponseByError();
+        }
+        //设置唯一名字
+        String originalFilename=file.getOriginalFilename();
+        //获取图片的拓展名
+        String exName=originalFilename.substring(originalFilename.lastIndexOf("."));
+        //生成图片新名字   唯一
+        String newFileName=UUID.randomUUID().toString()+exName;
+        File pathFile=new File(path);
+        if (!pathFile.exists()){   //判断路径是否存在
+            pathFile.setWritable(true);              //若存在可操作
+            pathFile.mkdirs();                      //若不存在就要生成此目录
+        }
+        File file1=new File(path,newFileName);
+        try {
+            file.transferTo(file1);
+            //上传到图片服务器
+            FTPUtil.uploadFile(Lists.newArrayList(file1));
+            //......
+            Map<String,String> map=Maps.newHashMap();
+            map.put("uri",newFileName);
+            map.put("url",PropertiesUtil.readByKey("imageHost")+"/"+newFileName);
+
+            //删除应用服务器上图片
+//            file1.delete();
+            return  ServerResponse.createServerResponseBySuccess(map);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * 前台接口--商品详细
+     * @param productId
+     * @return
+     */
+    @Override
+    public ServerResponse detailprotal(Integer productId) {
+       //1.参数非空校验
+        if (productId==null){
+            return ServerResponse.createServerResponseByError("商品的id不能为空");
+        }
+        //2.查询product
+         Product product=productMapper.selectByPrimaryKey(productId);
+         //商品的非空判断
+         if (product==null){
+             return ServerResponse.createServerResponseByError("商品不存在");
+         }
+       //根据商品id查询
+       //3.校验商品状态
+        if (product.getStatus()!=ResponseCodeCategory.PRODUCT_ONLINE.getStatus()){
+             return ServerResponse.createServerResponseByError("商品已下架或或删除");
+        }
+       //4.获取  productDataVO
+
+       ProductDetaVo productDetaVo= assembProductDetaVo(product);
+           //5.返回结果
+        return ServerResponse.createServerResponseBySuccess(productDetaVo);
+    }
+
+    @Override
+    public ServerResponse list(Integer categoryId, String keyword, Integer pageNum, Integer pageSize, String orderby) {
+        //1.参数的校验         categoryId 和            keyword不能同时为空
+        if (categoryId==null&&(keyword==null||keyword.equals(""))){
+           return ServerResponse.createServerResponseByError("参数错误");
+        }
+     Set<Integer> integerSet=Sets.newHashSet();
+        //2.根据 categoryId查询
+        if (categoryId!=null){
+            Category category=categoryMapper.selectByPrimaryKey(categoryId);
+            if (category==null&&(keyword==null||keyword.equals(""))){
+                //说明没有商品数据
+                PageHelper.startPage(pageNum,pageSize);
+                List<ProductListVo> productListVoList=Lists.newArrayList();
+                PageInfo pageInfo=new PageInfo(productListVoList);
+                return ServerResponse.createServerResponseBySuccess(pageInfo);
+            }
+            //查询类别下所有子类----递归查询
+           ServerResponse serverResponse= categoryService.get_deep_category(categoryId);
+
+            if (serverResponse.isSuccess()){
+                integerSet=(Set<Integer>)serverResponse.getData();
+            }
+        }
+        //关键字//3.根据keyword查询
+        if (keyword!=null&&!keyword.equals("")){
+            keyword="%"+keyword+"%";
+        }
+
+
+        if (orderby.equals("")){
+            PageHelper.startPage(pageNum,pageSize);
+        }else {
+           String[] orderByArr= orderby.split("_");
+           if (orderByArr.length>1){
+               PageHelper.startPage(pageNum,pageSize,orderByArr[0]+" "+orderByArr[1]);
+           }else {
+                //分页查
+               PageHelper.startPage(pageNum,pageSize);
+           }
+
+        }
+
+
+      //4.将 List<Product>转换为List<ProductListVo>
+        List<Product> productList=productMapper.searchProduct(integerSet,keyword);
+        List<ProductListVo> productListVoList=Lists.newArrayList();
+          if (productList!=null&&productList.size()>0){
+              for (Product product : productList) {
+                 ProductListVo productListVo=assembProductListVo(product);
+                 productListVoList.add(productListVo);
+              }
+
+          }
+
+
+        //5.分页
+        PageInfo pageInfo=new PageInfo();
+          pageInfo.setList(productListVoList);
+        //6.返回结果
         return ServerResponse.createServerResponseBySuccess(pageInfo);
     }
 }

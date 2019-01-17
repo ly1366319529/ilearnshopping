@@ -1,6 +1,9 @@
 package com.neuedu.dao;
 
 import com.neuedu.pojo.Order;
+import com.sun.tools.corba.se.idl.constExpr.Or;
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
 
 public interface OrderMapper {
@@ -43,4 +46,16 @@ public interface OrderMapper {
      * @mbg.generated
      */
     int updateByPrimaryKey(Order record);
+    /**
+     * 根据订单编号和userId 查询 订单
+     */
+    Order findOrderByUserIdAndOrderNo(@Param("userId") Integer userId,@Param("orderNo") long orderNo);
+    /**
+     * 分页查询
+     */
+    List<Order> findOrderByUserId(Integer userId);
+    /**
+     * 根据订单号查询订单信息
+     */
+     Order findOrderByOrderNo(Long orderNo);
 }

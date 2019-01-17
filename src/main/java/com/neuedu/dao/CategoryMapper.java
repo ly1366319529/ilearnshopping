@@ -51,4 +51,5 @@ public interface CategoryMapper {
      * 查询商品的父类
      */
     Category findparentCategory(Integer category);
+
 }

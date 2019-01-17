@@ -111,10 +111,10 @@ public class ProductController {
      */
     @RequestMapping("/search.do")
     public ServerResponse search(HttpSession session,
-                                @RequestParam(value = "productId",required = false,defaultValue = "1")Integer productId,
-                                @RequestParam(value = "productId",required = false,defaultValue = "")String productName,
+                                @RequestParam(value = "productId",required = false )Integer productId,
+                                @RequestParam(value = "productName",required = false )String productName,
                                @RequestParam(value = "pageNum",required = false,defaultValue = "1")Integer pageNum,
-                               @RequestParam(value = "pageSize",required = false,defaultValue = "10")Integer pageSize){
+                               @RequestParam(value= "pageSize",required = false,defaultValue = "10")Integer pageSize){
 
         //判断用户是否登陆
         UserInfo userInfo=(UserInfo) session.getAttribute(Const.CURRENTUSER);
@@ -134,8 +134,8 @@ public class ProductController {
     /**
      * 图片上传
      */
-    @RequestMapping("/search.do")
-    public ServerResponse search(HttpSession session){
-return null;
-    }
+/*   @RequestMapping("/search.do")
+   public ServerResponse search(HttpSession session){
+   return null;
+   }*/
 }

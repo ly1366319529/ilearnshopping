@@ -7,4 +7,5 @@
   ##### <module type="JAVA_MODULE" version="4" />
    ### maven中运行框架没有mybatis-generator 插件
    ##### 原因 pom.xml中插件有问题 重写再写一遍，重新加载
+   ##### ProductServiceImpl,ProductController出错 找sql语句
 

@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpSession;
 import java.util.Date;
 
@@ -72,7 +73,7 @@ public class UserController {
             response_UserInfo.setCreateTime(userInfo.getCreateTime());
             response_UserInfo.setUpdateTime(userInfo.getUpdateTime());
             return ServerResponse.createServerResponseBySuccess(null,response_UserInfo);
-
+          
         }
         return ServerResponse.createServerResponseByError(ResponseCode.USER_NOT_LOGIN.getStatus(),ResponseCode.USER_NOT_LOGIN.getMsg());
     }

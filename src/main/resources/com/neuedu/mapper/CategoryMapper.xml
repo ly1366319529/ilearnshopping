@@ -42,8 +42,8 @@
     set parent_id = #{parentId,jdbcType=INTEGER},
       username = #{username,jdbcType=VARCHAR},
       status = #{status,jdbcType=INTEGER},
-      create_time =new(),
-      update_time = #{updateTime,jdbcType=TIMESTAMP}
+      create_time =now(),
+      update_time =now()
     where id = #{id,jdbcType=INTEGER}
   </update>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">

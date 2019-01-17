@@ -43,4 +43,15 @@ public interface OrderItemMapper {
      * @mbg.generated
      */
     int updateByPrimaryKey(OrderItem record);
+
+    /**
+     * 订单明细批量加入
+     * @param orderItemList
+     * @return
+     */
+    int inserBatch(List<OrderItem> orderItemList);
+    /**
+     * 根据订单单号查询订单明细
+     */
+    List<OrderItem> findOrderItemByOrderNo(Long orderNo);
 }

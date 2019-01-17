@@ -98,5 +98,6 @@
   password = #{passwordNew,jdbcType=VARCHAR},
   update_time = now()
   where username = #{username,jdbcType=VARCHAR}
+
 </update>
 </mapper>

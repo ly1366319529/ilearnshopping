@@ -3,6 +3,7 @@ package com.neuedu.common;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import org.apache.ibatis.reflection.Jdk;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -31,7 +32,6 @@ public class TokenCache {
     public static  void put(String key,String value){
         loadingCache.put(key,value);
     }
-
     /**
      * 像缓存添加键值对
      */
